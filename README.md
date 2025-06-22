@@ -6,7 +6,7 @@ A **three-phase secure login system** that uses **text-based**, **color-based**,
 
 ## 🚀 Live Demo
 
-👉 [Click here to try the live app]([https://graphical-password-to-avoid-shoulder-surfing.onrender.com](https://graphical-password-to-avoid-shoulder.onrender.com)
+👉 [Click here to try the live app](https://graphical-password-to-avoid-shoulder.onrender.com)
 
 ---
 
@@ -56,7 +56,7 @@ python app.py
 ## 🙋‍♀️ Author
 
 **Shruti V. Rathod**  
-[LinkedIn]([https://www.linkedin.com/in/shruti-rathod/](https://www.linkedin.com/in/shruti-rathod-75775523b/) | [GitHub](https://github.com/shrutirathod12)
+[LinkedIn](https://www.linkedin.com/in/shruti-rathod-75775523b/) | [GitHub](https://github.com/shrutirathod12)
 
 ---
 
