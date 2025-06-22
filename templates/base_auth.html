@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Image Authentication{% endblock %}</title>
+    <style>
+        :root {
+            --grid-size: 5;
+            --cell-size: 100px;
+        }
+
+        .auth-container {
+            max-width: calc(var(--cell-size) * var(--grid-size) + 40px);
+            margin: 2rem auto;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(var(--grid-size), 1fr);
+            gap: 5px;
+            margin: 20px 0;
+        }
+
+        .grid-item {
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .grid-item img {
+            width: 100%;
+            height: var(--cell-size);
+            object-fit: cover;
+            border: 2px solid transparent;
+            border-radius: 4px;
+        }
+
+        .grid-item.selected img {
+            border-color: #4CAF50;
+            filter: brightness(1.1);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .flash {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .flash.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .flash.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="auth-container">
+        <h2>{% block heading %}{% endblock %}</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const gridItems = document.querySelectorAll('.grid-item');
+            const coordInput = document.querySelector('input[name="coordinates"]');
+            let selections = [];
+
+            gridItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const img = item.querySelector('img');
+                    const value = img.src.split('/').pop();
+                    const x = item.dataset.x;
+                    const y = item.dataset.y;
+
+                    if (selections.includes(value)) {
+                        // Deselect
+                        selections = selections.filter(v => v !== value);
+                        item.classList.remove('selected');
+                    } else if (selections.length < 2) {
+                        // Select
+                        selections.push(value);
+                        item.classList.add('selected');
+                    }
+
+                    // Update coordinates
+                    const coords = selections.map(v => {
+                        const parent = document.querySelector(`img[src*="${v}"]`).parentElement;
+                        return `${parent.dataset.x},${parent.dataset.y}`;
+                    });
+                    
+                    if(coordInput) coordInput.value = coords.join('|');
+                });
+            });
+
+            document.querySelector('form').addEventListener('submit', (e) => {
+                if (selections.length !== 2) {
+                    e.preventDefault();
+                    alert('Please select exactly 2 images');
+                }
+            });
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
