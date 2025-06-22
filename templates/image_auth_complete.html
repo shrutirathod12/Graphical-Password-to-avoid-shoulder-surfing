@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Based Authentication - Login</title>
+    <style>
+        body {
+            background-image: url('{{ url_for('static', filename='background.png') }}');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+        }
+
+        .flash-message {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .flash-message.success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .flash-message.error {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .main-container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #f4f4f4;
+        }
+
+        .instruction {
+            font-size: 1rem;
+            color: #ddd;
+            font-style: italic;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            max-width: 600px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .grid-item {
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .grid-item img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 2px solid transparent;
+        }
+
+        .grid-item.selected img {
+            border-color: #007bff;
+        }
+
+        .submit-container {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+            padding-right: 20px;
+        }
+
+        .submit-button {
+            padding: 12px 24px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        .help-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            border: none;
+            background: none;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .help-button:hover {
+            text-decoration: underline;
+        }
+        
+    </style>
+</head>
+<body>
+
+    
+
+    <div class="header">
+        <h1 class="title">Image-Based Login</h1>
+        <p class="instruction">NOTE - Select two images based on your registration rules.</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="main-container">
+        <a href="{{ url_for('help') }}" class="help-button">Help?</a>
+        <form id="loginForm" method="POST" action="{{ url_for('image_auth_complete') }}">         
+            <div class="grid-container">
+                {% for image in images %}
+                    <label class="grid-item" data-x="{{ loop.index0 // 5 }}" data-y="{{ loop.index0 % 5 }}">
+                        <input type="checkbox" name="selected_images" value="{{ image }}" style="display: none;">
+                        <img src="{{ url_for('static', filename='images/' + image) }}" alt="Selectable image {{ loop.index }}">
+                    </label>
+                {% endfor %}
+            </div>
+            <input type="hidden" name="image_coordinates">
+            <div class="submit-container">
+                <button type="submit" class="submit-button">Submit</button>
+            </div>
+            <div style="position: relative; left: 10px; margin-top: -20px;">
+                <a href="{{ url_for('forgot_image') }}" style="color: red; text-decoration: underline; font-size: 1rem;">Forgot Image?</a>
+            </div>
+             
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const gridContainer = document.querySelector('.grid-container');
+            const coordinatesInput = document.querySelector('input[name="image_coordinates"]');
+            const submitButton = document.querySelector('.submit-button');
+
+            function updateSelection(target) {
+                const checkbox = target.querySelector('input[type="checkbox"]');
+                checkbox.checked = !checkbox.checked;
+
+                const selectedItems = document.querySelectorAll('input[type="checkbox"]:checked');
+
+                if (selectedItems.length > 2) {
+                    checkbox.checked = false;
+                    alert('You can only select two images.');
+                    return;
+                }
+
+                target.classList.toggle('selected', checkbox.checked);
+
+                const coordinates = Array.from(selectedItems).map((item) => {
+                    const parent = item.closest('.grid-item');
+                    return `${parent.getAttribute('data-x')},${parent.getAttribute('data-y')}`;
+                });
+
+                console.log('Selected coordinates:', coordinates);
+
+                if (coordinates.length === 2) {
+                    coordinatesInput.value = coordinates.join('|');
+                }
+            }
+
+            gridContainer.addEventListener('click', function (event) {
+                const target = event.target.closest('.grid-item');
+                if (target) {
+                    updateSelection(target);
+                }
+            });
+
+            submitButton.addEventListener('click', function (event) {
+                const selectedItems = document.querySelectorAll('input[type="checkbox"]:checked');
+                if (selectedItems.length !== 2) {
+                    event.preventDefault();
+                    alert('Please select exactly two images.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

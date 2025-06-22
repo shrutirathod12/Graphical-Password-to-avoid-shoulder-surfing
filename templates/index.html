@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Trisecure</title>
+    <style>
+    body {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-image: url('{{ url_for("static", filename="background.png") }}');
+        background-size: cover;
+        background-position: center;
+    }
+
+    header h1 {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        font-size: 40px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #c2e0e7;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+    }
+
+    .content {
+        width: 45%;
+        text-align: center;
+        padding: 20px;
+        color: white;
+    }
+
+    .button-container {
+        margin-top: 20px;
+    }
+
+    header h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+
+    .login-section, .register-section {
+        padding: 20px;
+        margin: 10px;
+        background-color: rgba(0, 0, 0, 0.5);
+        border-radius: 10px;
+    }
+
+    .login-section button, .register-section button {
+        padding: 10px 20px;
+        margin-top: 10px;
+        background-color: #6fbfe7;
+        color: white;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+
+    .login-section button:hover, .register-section button:hover {
+        background-color: #5aa9cf;
+    }
+
+    /* Top-right Help & About */
+    .top-buttons {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 14px;
+    }
+
+    .top-buttons button,
+    .top-buttons .nav-button {
+        color: white;
+        border: none;
+        background: none;
+        font-size: 14px;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .top-buttons .nav-button:hover,
+    .top-buttons button:hover {
+        text-decoration: underline;
+    }
+
+    .top-buttons span {
+        margin: 0 5px;
+    }
+
+    /* About Modal */
+    .info-modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+        background-color: white;
+        margin: 15% auto;
+        padding: 20px;
+        border-radius: 10px;
+        width: 80%;
+        max-width: 400px;
+    }
+
+    .close-btn {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close-btn:hover,
+    .close-btn:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Trisecure</h1>
+    </header>
+
+    <div class="content login-section">
+        <header>
+            <h2>Login to your account</h2>
+        </header>
+        <div class="button-container">
+            <button onclick="window.location.href='/login'">Login</button>
+        </div>
+    </div>
+
+    <div class="content register-section">
+        <header>
+            <h2>New here?</h2>
+        </header>
+        <div class="button-container">
+            <button onclick="window.location.href='/register'">Register</button>
+        </div>
+    </div>
+
+    <!-- Top-right Help and About buttons -->
+    <div class="top-buttons">
+        <button id="aboutButton">About</button>
+        <span>|</span>
+        <a href="{{ url_for('help') }}" class="nav-button">Help</a>
+    </div>
+
+    <!-- About Modal -->
+    <div class="info-modal" id="infoModalAbout">
+        <div class="modal-content">
+            <span class="close-btn" id="closeAbout">&times;</span>
+            <p>Trisecure is an advanced multi-phase authentication system designed to provide robust security for your online accounts. It uses a combination of text-based passwords, color-based authentication, and image-based recognition to protect your information.</p>
+        </div>
+    </div>
+
+    <script>
+        // Open the About Modal
+        document.getElementById('aboutButton').addEventListener('click', function() {
+            document.getElementById('infoModalAbout').style.display = 'block';
+        });
+
+        // Close the About Modal
+        document.getElementById('closeAbout').addEventListener('click', function() {
+            document.getElementById('infoModalAbout').style.display = 'none';
+        });
+
+        // Close modal if clicked outside
+        window.addEventListener('click', function(event) {
+            if (event.target.className === 'info-modal') {
+                document.getElementById('infoModalAbout').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

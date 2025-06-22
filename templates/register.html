@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+    
+    <style>
+        /* Body styling */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: url('{{ url_for("static", filename="background.png") }}');
+            background-size: cover;
+            background-position: center;
+            color: white;
+        }
+    
+        /* Help Button Styling (matching login.html) */
+        .help-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            border: none;
+            background: none;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .help-button:hover {
+            text-decoration: underline;
+        }
+        
+    
+        /* Form container styling */
+        .form-container {
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px #6fbfe7;
+            width: 600px;
+            text-align: center;
+        }
+    
+        /* Header styling */
+        .form-container h2 {
+            font-size: 32px;
+            color: #c2e0e7;
+            margin-bottom: 25px;
+        }
+    
+        /* Form label styling */
+        label {
+            display: block;
+            text-align: left;
+            margin: 15px 0 5px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+    
+        /* Input and select styling */
+        input[type="email"],
+        input[type="password"],
+        input[type="tel"],
+        input[type="number"],
+        input[type="text"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            background-color: #1b2a3d;
+            color: white;
+            font-size: 16px;
+        }
+    
+        /* Submit button styling */
+        button[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background-color: #6fbfe7;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    
+        button[type="submit"]:hover {
+            background-color: #5aa9cf;
+        }
+    
+        /* Password Requirement Message */
+        #passwordMessage {
+            display: none;
+            color: #ff5555;
+            font-size: 14px;
+            text-align: left;
+            margin-top: 5px;
+        }
+    
+        /* Flash messages */
+        .flash-messages {
+            list-style-type: none;
+            padding: 0;
+            margin: 15px 0;
+        }
+    
+        .flash-messages li {
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #ff5555;
+            color: white;
+            border-radius: 5px;
+        }
+    </style>
+    
+</head>
+<body>
+    <!-- Help Button -->
+    <a href="{{ url_for('help') }}" class="help-button">Help</a>
+
+
+    <div class="form-container">
+        <h2>Registration Form</h2>
+
+        <!-- Display flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Registration form -->
+        <form method="POST" action="{{ url_for('register') }}">
+            <label for="email">Email:</label>
+            <input type="email" name="email" id="email" required>
+        
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" required minlength="8" onkeyup="checkPassword()">
+            <div id="passwordMessage">
+                <ul>
+                    <li id="uppercase">At least one uppercase letter</li>
+                    <li id="lowercase">At least one lowercase letter</li>
+                    <li id="number">At least one number</li>
+                    <li id="special">At least one special character</li>
+                    <li id="minimum">Minimum 8 characters</li>
+                </ul>
+            </div>
+        
+            <label for="confirm_password">Confirm Password:</label>
+            <input type="password" name="confirm_password" id="confirm_password" required minlength="8">
+                
+            <label for="full_name">Full Name:</label>
+            <input type="text" name="full_name" id="full_name" required>
+        
+            <label for="dob">Date of Birth:</label>
+            <input type="date" id="dob" name="dob" required>
+
+            <label for="security_question">Security Question:</label>
+            <select id="security_question" name="security_question" required>
+                <option value="" disabled selected>Select your security question</option>
+                <option value="pet_name">What is your pet's name?</option>
+                <option value="favorite_color">What is your favorite color?</option>
+                <option value="hobby">What is your hobby?</option>
+            </select>
+        
+            <label for="security_answer">Answer:</label>
+            <input type="text" id="security_answer" name="security_answer" required>
+        
+            <button type="submit">Register</button>
+        </form>
+    </div>
+
+    <script>
+        // Check password requirements
+        function checkPassword() {
+            const password = document.getElementById('password').value;
+            const uppercase = /[A-Z]/.test(password);
+            const lowercase = /[a-z]/.test(password);
+            const number = /\d/.test(password);
+            const special = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+            document.getElementById('uppercase').style.color = uppercase ? 'green' : 'red';
+            document.getElementById('lowercase').style.color = lowercase ? 'green' : 'red';
+            document.getElementById('number').style.color = number ? 'green' : 'red';
+            document.getElementById('special').style.color = special ? 'green' : 'red';
+
+            // Show password message if criteria not met
+            if (!uppercase || !lowercase || !number || !special) {
+                document.getElementById('passwordMessage').style.display = 'block';
+            } else {
+                document.getElementById('passwordMessage').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

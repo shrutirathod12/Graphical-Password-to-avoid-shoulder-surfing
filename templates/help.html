@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Help Centre</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 20px;
+    }
+
+    header h1 {
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 30px;
+      color: #333;
+    }
+
+    .accordion {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .accordion-item {
+      background-color: #fff;
+      margin-bottom: 15px;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .accordion-btn {
+      width: 100%;
+      padding: 16px;
+      text-align: left;
+      font-size: 18px;
+      font-weight: bold;
+      background-color: #e9ecef;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .accordion-btn:hover {
+      background-color: #d6d8db;
+    }
+
+    .accordion-content {
+      display: none;
+      padding: 15px;
+      background-color: #fff;
+    }
+
+    .accordion-content video,
+    .accordion-content img {
+      width: 100%;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 16px;
+      color: #555;
+    }
+
+    footer a {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Help Centre</h1>
+  </header>
+
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-btn">1. How to register?</button>
+      <div class="accordion-content">
+        <video controls>
+          <source src="{{ url_for('static', filename='help page/registration.mp4') }}" type="video/mp4">
+
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <button class="accordion-btn">2. How to login?</button>
+      <div class="accordion-content">
+        <video controls>
+          <source src="{{ url_for('static', filename='help page/login.mp4') }}" type="video/mp4">
+
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <button class="accordion-btn">3. How to Reset Text/Image/Color Password? </button>
+      <div class="accordion-content">
+        <img src="{{ url_for('static', filename='help page/reset password.png') }}" alt="Reset Password Help" style="max-width: 100%; height: auto;">
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>If you face any issue, please <a href="/help">go to help</a>.</p>
+  </footer>
+
+  <script>
+    const buttons = document.querySelectorAll('.accordion-btn');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const content = btn.nextElementSibling;
+        content.style.display = content.style.display === 'block' ? 'none' : 'block';
+      });
+    });
+  </script>
+
+</body>
+</html>

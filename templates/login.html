@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Trisecure</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: url('{{ url_for("static", filename="background.png") }}');
+            background-size: cover;
+            background-position: center;
+            color: white;
+        }
+
+        .login-container {
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px #6fbfe7;
+            width: 400px;
+            text-align: center;
+        }
+
+        .login-container h1 {
+            font-size: 32px;
+            color: #c2e0e7;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            text-align: left;
+            margin: 15px 0 5px;
+            font-weight: bold;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            background-color: #1b2a3d;
+            color: white;
+            font-size: 16px;
+        }
+
+        .forgot-password {
+            text-align: right;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .forgot-password a {
+            color: #6fbfe7;
+            text-decoration: none;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+        .auth-button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background-color: #6fbfe7;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .auth-button:hover {
+            background-color: #5aa9cf;
+        }
+
+        .flash-messages {
+            list-style-type: none;
+            padding: 0;
+            margin: 15px 0;
+        }
+
+        .flash-messages li {
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #ff5555;
+            color: white;
+            border-radius: 5px;
+        }
+
+        /* Top-right Help & About */
+        .top-buttons {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 14px;
+        }
+
+        .top-buttons button,
+        .top-buttons .nav-button {
+            color: white;
+            border: none;
+            background: none;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .top-buttons .nav-button:hover,
+        .top-buttons button:hover {
+            text-decoration: underline;
+        }
+
+        .top-buttons span {
+            margin: 0 5px;
+        }
+
+        /* About Modal */
+        .info-modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 400px;
+            color: black;
+        }
+
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close-btn:hover,
+        .close-btn:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top-right Help and About buttons -->
+    <div class="top-buttons">
+        <button id="aboutButton">About</button>
+        <span>|</span>
+        <a href="{{ url_for('help') }}" class="nav-button">Help</a>
+    </div>
+
+    <!-- Login Form -->
+    <div class="login-container">
+        <h1>Login to Trisecure</h1>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class="flash-messages">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="/login">
+            <label for="email">Email</label>
+            <input type="email" name="email" id="email" required>
+
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" required>
+
+            <div class="forgot-password">
+                <a href="/forgot-password">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="auth-button">Login</button>
+        </form>
+    </div>
+
+    <!-- About Modal -->
+    <div class="info-modal" id="infoModalAbout">
+        <div class="modal-content">
+            <span class="close-btn" id="closeAbout">&times;</span>
+            <p>Trisecure is an advanced multi-phase authentication system designed to provide robust security for your online accounts. It uses a combination of text-based passwords, color-based authentication, and image-based recognition to protect your information.</p>
+        </div>
+    </div>
+
+    <script>
+        // Open the About Modal
+        document.getElementById('aboutButton').addEventListener('click', function() {
+            document.getElementById('infoModalAbout').style.display = 'block';
+        });
+
+        // Close the About Modal
+        document.getElementById('closeAbout').addEventListener('click', function() {
+            document.getElementById('infoModalAbout').style.display = 'none';
+        });
+
+        // Close modal if clicked outside
+        window.addEventListener('click', function(event) {
+            if (event.target.className === 'info-modal') {
+                document.getElementById('infoModalAbout').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Image Selection</title>
+    <style>
+        /* General Body Styling */
+        body {
+            background-image: url('{{ url_for('static', filename='background.png') }}');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+        }
+
+        /* Flash Message Styling */
+        .flash-message {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .flash-message.success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .flash-message.error {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .main-container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #f4f4f4;
+        }
+
+        .instruction {
+            font-size: 1rem;
+            color: #ddd;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            max-width: 600px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .grid-item {
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .grid-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .grid-item img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 2px solid transparent;
+        }
+
+        .grid-item.selected img {
+            border-color: #007bff;
+        }
+
+        .submit-container {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+            padding-right: 20px;
+        }
+
+        .submit-button {
+            padding: 12px 24px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        .help-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .help-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .help-modal-content {
+            background: #333;
+            padding: 30px;
+            border-radius: 12px;
+            width: 60%;
+            color: white;
+        }
+
+        .help-modal-content h3 {
+            color: #1e90ff;
+            font-size: 1.5rem;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 30px;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="title">Image-Based Password Setup</h1>
+        <p class="instruction">Select exactly two images</p>
+    </div>
+
+    <button class="help-button" onclick="openHelp()">Help</button>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="main-container">
+        <form id="imageForm" method="POST" action="{{ url_for('reset_image_selection') }}">
+            <div class="grid-container">
+                {% for image in images %}
+                    <label class="grid-item" data-x="{{ loop.index0 // 5 }}" data-y="{{ loop.index0 % 5 }}">
+                        <input type="checkbox" name="selected_images" value="{{ image }}" style="display: none;">
+                        <img src="{{ url_for('static', filename='images/' + image) }}" alt="{{ image }}">
+                    </label>
+                {% endfor %}
+            </div>
+            <input type="hidden" name="image_coordinates">
+            <div class="submit-container">
+                <button type="submit" class="submit-button">Submit</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="help-modal" id="helpModal">
+        <div class="help-modal-content">
+            <span class="close-btn" onclick="closeHelp()">&times;</span>
+            <h3>Help</h3>
+            <p>Select exactly two images from the grid. These images will form part of your password for future logins.</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const gridItems = document.querySelectorAll('.grid-item');
+            const coordinatesInput = document.querySelector('input[name="image_coordinates"]');
+            const submitButton = document.querySelector('.submit-button');
+
+            gridItems.forEach((item) => {
+                item.addEventListener('click', function () {
+                    const checkbox = this.querySelector('input[type="checkbox"]');
+                    checkbox.checked = !checkbox.checked;
+
+                    const selectedItems = document.querySelectorAll('input[type="checkbox"]:checked');
+                    if (selectedItems.length > 2) {
+                        checkbox.checked = false;
+                        alert('You can only select two images.');
+                        return;
+                    }
+
+                    this.classList.toggle('selected', checkbox.checked);
+
+                    const coordinates = Array.from(selectedItems).map(item => {
+                        const parent = item.closest('.grid-item');
+                        return `${parent.getAttribute('data-x')},${parent.getAttribute('data-y')}`;
+                    });
+                    coordinatesInput.value = coordinates.join('|');
+                });
+            });
+
+            submitButton.addEventListener('click', function (event) {
+                const selectedItems = document.querySelectorAll('input[type="checkbox"]:checked');
+                if (selectedItems.length !== 2) {
+                    event.preventDefault();
+                    alert('Please select exactly two images.');
+                }
+            });
+        });
+
+        function openHelp() {
+            document.getElementById('helpModal').style.display = 'flex';
+        }
+
+        function closeHelp() {
+            document.getElementById('helpModal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
